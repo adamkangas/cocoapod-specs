@@ -34,7 +34,7 @@ Pod::Spec.new do |s|
   # over the selected files.
   # (See http://rake.rubyforge.org/classes/Rake/FileList.html.)
   #
-  s.source_files = 'src/*.{c,h,rc,h.in}'
+  s.source_files = 'src/*.{c,h,rc,h.in,h.orig}'
 
   # A list of resources included with the Pod. These are copied into the
   # target bundle with a build phase script.
@@ -79,4 +79,12 @@ Pod::Spec.new do |s|
   # Finally, specify any Pods that this Pod depends on.
   #
   # s.dependency 'JSONKit', '~> 1.4'
+
+  def s.post_install(target)
+    src_dir = "#{config.project_pods_root}lua/src"
+    headers_dir = "#{config.project_pods_root}Headers/lua"
+    FileUtils.cp "#{src_dir}/luaconf.h.orig", "#{src_dir}/luaconf.h"
+    FileUtils.rm "#{src_dir}/luaload_rel.c"
+    FileUtils.ln_s "#{src_dir}/luaconf.h", "#{headers_dir}/luaconf.h"
+  end
 end
