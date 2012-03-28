@@ -5,7 +5,7 @@
 # Remove all comments before submitting the spec.
 #
 Pod::Spec.new do |s|
-  s.name     = 'lua'
+  s.name     = 'liblua'
   s.version  = '5.1.4'
   s.license  = 'MIT'
   s.summary  = 'A short description of lua.'
@@ -81,10 +81,21 @@ Pod::Spec.new do |s|
   # s.dependency 'JSONKit', '~> 1.4'
 
   def s.post_install(target)
-    src_dir = "#{config.project_pods_root}lua/src"
-    headers_dir = "#{config.project_pods_root}Headers/lua"
+    lua_pbxgroup = target.project.groups.select {|g| g.name == "lua" }.first
+    raise "Couldn't find lua PBXGroup" unless lua_pbxgroup
+
+    src_dir = "#{config.project_pods_root}/lua/src"
+    headers_dir = "#{config.project_pods_root}/Headers/lua"
+
     FileUtils.cp "#{src_dir}/luaconf.h.orig", "#{src_dir}/luaconf.h"
-    FileUtils.rm "#{src_dir}/luaload_rel.c"
+    lua_pbxgroup.files.new('path' => "#{src_dir}/luaconf.h")
+
+    %w(loadlib_rel.c lua.c luac.c).each do |filename|
+      FileUtils.rm "#{src_dir}/#{filename}"
+      lua_pbxgroup.files.select {|f| f.name == filename }.each {|f| target.project.objects_hash.delete(f.uuid) }
+#    target.project.pods.files.where(:name => "loadlib_rel.c").destroy
+    end
+
     FileUtils.ln_s "#{src_dir}/luaconf.h", "#{headers_dir}/luaconf.h"
   end
 end
