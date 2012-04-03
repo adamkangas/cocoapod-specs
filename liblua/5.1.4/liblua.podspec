@@ -81,8 +81,8 @@ Pod::Spec.new do |s|
   # s.dependency 'JSONKit', '~> 1.4'
 
   def s.post_install(target)
-    lua_pbxgroup = target.project.groups.select {|g| g.name == "lua" }.first
-    raise "Couldn't find lua PBXGroup" unless lua_pbxgroup
+    lua_pbxgroup = target.project.groups.select {|g| g.name == "liblua" }.first
+    raise "Couldn't find liblua PBXGroup" unless lua_pbxgroup
 
     src_dir = "#{config.project_pods_root}/lua/src"
     headers_dir = "#{config.project_pods_root}/Headers/lua"
